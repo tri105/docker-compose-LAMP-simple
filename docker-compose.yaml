@@ -1,0 +1,49 @@
+version: "3"
+services:
+
+  web:
+    build: .
+    image: web-lamp
+    volumes:
+      - ./htdocs:/var/www/html
+    ports:
+      - "80:80"
+    restart: always
+    links:
+      - db
+    networks:
+      - lamp-net
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password_ROOT
+      MYSQL_DATABASE: web
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    networks:
+      - lamp-net
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password_ROOT
+    networks:
+      - lamp-net
+
+networks:
+  lamp-net:
+
+volumes:
+  htdocs:
+  db:
